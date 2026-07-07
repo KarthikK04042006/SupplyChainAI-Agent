@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{layout :: head('My Profile')}"></th:block>
+</head>
+<body class="app-body">
+<div class="app-wrapper">
+    <th:block th:replace="~{layout :: sidebar}"></th:block>
+    <div class="main-content" id="mainContent">
+        <th:block th:replace="~{layout :: navbar}"></th:block>
+
+        <div class="page-content">
+            <div class="page-header" data-aos="fade-down">
+                <div>
+                    <h1 class="page-title">My Profile</h1>
+                    <p class="page-subtitle">Manage your account information</p>
+                </div>
+            </div>
+
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" data-aos="fade-down">
+                <i class="fas fa-check-circle me-2"></i><span th:text="${successMessage}">Success</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" data-aos="fade-down">
+                <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorMessage}">Error</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="row g-4">
+                <!-- Profile Card -->
+                <div class="col-xl-4" data-aos="fade-right">
+                    <div class="chart-card text-center">
+                        <div class="chart-body py-5">
+                            <div class="profile-avatar-wrapper mb-4">
+                                <div class="profile-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            </div>
+                            <h4 class="fw-bold mb-1" th:text="${user.firstName + ' ' + user.lastName}">Full Name</h4>
+                            <p class="text-muted mb-1" th:text="${user.email}">email@example.com</p>
+                            <p class="text-muted small mb-3">
+                                <span th:each="role : ${user.roles}" class="badge bg-primary me-1" th:text="${role.name.replace('ROLE_', '')}">USER</span>
+                            </p>
+                            <div class="row g-3 text-start border-top pt-3 mt-2">
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Username</small>
+                                    <span class="fw-semibold" th:text="${user.username}">username</span>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Status</small>
+                                    <span class="badge bg-success">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Profile Form -->
+                <div class="col-xl-8" data-aos="fade-left">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h5 class="chart-title">Edit Profile Information</h5>
+                        </div>
+                        <div class="chart-body">
+                            <form th:action="@{/profile/update}" method="post" th:object="${updateDto}">
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">First Name</label>
+                                        <input type="text" class="form-control" th:field="*{firstName}"
+                                               th:value="${user.firstName}" placeholder="First Name">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Last Name</label>
+                                        <input type="text" class="form-control" th:field="*{lastName}"
+                                               th:value="${user.lastName}" placeholder="Last Name">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Email Address</label>
+                                    <input type="email" class="form-control" th:field="*{email}"
+                                           th:value="${user.email}" placeholder="Email">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Username</label>
+                                    <input type="text" class="form-control" th:value="${user.username}" disabled>
+                                    <small class="text-muted">Username cannot be changed</small>
+                                </div>
+                                <hr>
+                                <h6 class="fw-semibold mb-3">Change Password <span class="text-muted small">(leave blank to keep current)</span></h6>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">New Password</label>
+                                    <input type="password" class="form-control" th:field="*{newPassword}" placeholder="New password">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Confirm Password</label>
+                                    <input type="password" class="form-control" th:field="*{confirmPassword}" placeholder="Confirm password">
+                                </div>
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="fas fa-save me-2"></i>Save Changes
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>var currentPage = 'profile';</script>
+<th:block th:replace="~{layout :: scripts}"></th:block>
+</body>
+</html>

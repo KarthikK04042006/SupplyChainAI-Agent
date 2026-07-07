@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{layout :: head('Analytics')}"></th:block>
+</head>
+<body class="app-body">
+<div class="app-wrapper">
+    <th:block th:replace="~{layout :: sidebar}"></th:block>
+    <div class="main-content" id="mainContent">
+        <th:block th:replace="~{layout :: navbar}"></th:block>
+
+        <div class="page-content">
+            <div class="page-header" data-aos="fade-down">
+                <div>
+                    <h1 class="page-title">Analytics Center</h1>
+                    <p class="page-subtitle">Deep-dive supply chain performance metrics</p>
+                </div>
+                <div class="page-actions">
+                    <!-- Filter Controls -->
+                    <select id="filterRegion" class="form-select form-select-sm" style="width:auto;display:inline-block;">
+                        <option value="">All Regions</option>
+                        <option th:each="r : ${regions}" th:value="${r}" th:text="${r}">Region</option>
+                    </select>
+                    <select id="filterCategory" class="form-select form-select-sm ms-2" style="width:auto;display:inline-block;">
+                        <option value="">All Categories</option>
+                        <option th:each="c : ${categories}" th:value="${c}" th:text="${c}">Category</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="row g-3 mb-4">
+                <div class="col-xl-2 col-md-4 col-6" data-aos="zoom-in" data-aos-delay="50">
+                    <div class="stat-mini-card">
+                        <div class="stat-mini-label">Total Orders</div>
+                        <div class="stat-mini-value counter" th:text="${summary.totalOrders}">0</div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4 col-6" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="stat-mini-card">
+                        <div class="stat-mini-label">Total Revenue</div>
+                        <div class="stat-mini-value">$<span th:text="${#numbers.formatDecimal(summary.totalSales, 0, 'COMMA', 0, 'POINT')}">0</span></div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4 col-6" data-aos="zoom-in" data-aos-delay="150">
+                    <div class="stat-mini-card">
+                        <div class="stat-mini-label">Total Profit</div>
+                        <div class="stat-mini-value">$<span th:text="${#numbers.formatDecimal(summary.totalProfit, 0, 'COMMA', 0, 'POINT')}">0</span></div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4 col-6" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="stat-mini-card">
+                        <div class="stat-mini-label">Profit Margin</div>
+                        <div class="stat-mini-value" th:text="${#numbers.formatDecimal(summary.profitMargin, 1, 1)} + '%'">0%</div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4 col-6" data-aos="zoom-in" data-aos-delay="250">
+                    <div class="stat-mini-card">
+                        <div class="stat-mini-label">Avg Order Value</div>
+                        <div class="stat-mini-value">$<span th:text="${#numbers.formatDecimal(summary.avgSales, 0, 'COMMA', 0, 'POINT')}">0</span></div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4 col-6" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="stat-mini-card">
+                        <div class="stat-mini-label">Units Sold</div>
+                        <div class="stat-mini-value counter" th:text="${summary.totalQuantity}">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1 -->
+            <div class="row g-4 mb-4">
+                <div class="col-xl-8" data-aos="fade-right">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div>
+                                <h5 class="chart-title">Revenue by Month</h5>
+                                <p class="chart-subtitle">Monthly sales and profit comparison</p>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="monthlyCompareChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4" data-aos="fade-left">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h5 class="chart-title">Sales by Segment</h5>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="segmentChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 2 -->
+            <div class="row g-4 mb-4">
+                <div class="col-xl-6" data-aos="fade-up">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h5 class="chart-title">Sales vs Profit by Category</h5>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="categoryProfitChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h5 class="chart-title">Regional Performance</h5>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="regionalBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Products Table -->
+            <div class="row g-4">
+                <div class="col-12" data-aos="fade-up">
+                    <div class="table-card">
+                        <div class="table-card-header">
+                            <h5 class="chart-title">Top Products by Revenue</h5>
+                            <div class="d-flex gap-2">
+                                <input type="text" id="productSearch" class="form-control form-control-sm"
+                                       placeholder="Search products..." style="width:200px;">
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="productsTable">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" data-sort="rank"># <i class="fas fa-sort ms-1"></i></th>
+                                        <th class="sortable" data-sort="product">Product <i class="fas fa-sort ms-1"></i></th>
+                                        <th class="sortable" data-sort="revenue">Revenue <i class="fas fa-sort ms-1"></i></th>
+                                        <th>Revenue Share</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsTableBody">
+                                    <tr th:if="${summary.topProducts == null or #maps.isEmpty(summary.topProducts)}">
+                                        <td colspan="4" class="text-center py-5 text-muted">
+                                            <i class="fas fa-inbox fa-3x mb-3 d-block opacity-50"></i>
+                                            No product data available. <a th:href="@{/upload}">Upload a CSV to get started.</a>
+                                        </td>
+                                    </tr>
+                                    <tr th:each="entry, stat : ${summary.topProducts}">
+                                        <td><span class="rank-badge" th:text="${stat.index + 1}">1</span></td>
+                                        <td th:text="${entry.key}">Product Name</td>
+                                        <td class="fw-semibold text-success">
+                                            $<span th:text="${#numbers.formatDecimal(entry.value, 0, 'COMMA', 0, 'POINT')}">0</span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="mini-bar flex-grow-1">
+                                                    <div class="mini-bar-fill"
+                                                         th:style="'width:' + ${summary.totalSales > 0 ? entry.value / summary.totalSales * 100 : 0} + '%'"></div>
+                                                </div>
+                                                <span class="small text-muted" style="min-width:40px"
+                                                      th:text="${#numbers.formatDecimal(summary.totalSales > 0 ? entry.value / summary.totalSales * 100 : 0, 1, 1)} + '%'">0%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    var monthlySalesData = /*[[${summary.monthlySales}]]*/ {};
+    var regionSalesData  = /*[[${summary.salesByRegion}]]*/ {};
+    var categorySalesData = /*[[${summary.salesByCategory}]]*/ {};
+    var segmentSalesData = /*[[${summary.salesBySegment != null ? summary.salesBySegment : {}}]]*/ {};
+    var currentPage = 'analytics';
+</script>
+<th:block th:replace="~{layout :: scripts}"></th:block>
+</body>
+</html>

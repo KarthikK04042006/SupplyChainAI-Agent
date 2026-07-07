@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{layout :: head('Upload Data')}"></th:block>
+</head>
+<body class="app-body">
+<div class="app-wrapper">
+    <th:block th:replace="~{layout :: sidebar}"></th:block>
+    <div class="main-content" id="mainContent">
+        <th:block th:replace="~{layout :: navbar}"></th:block>
+
+        <div class="page-content">
+            <div class="page-header" data-aos="fade-down">
+                <div>
+                    <h1 class="page-title">Upload Supply Chain Data</h1>
+                    <p class="page-subtitle">Import your CSV file to generate AI-powered insights</p>
+                </div>
+                <a th:href="@{/history}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-history me-1"></i> View Upload History
+                </a>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" data-aos="fade-down">
+                <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}">Error</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="row g-4">
+                <!-- Upload Card -->
+                <div class="col-xl-7" data-aos="fade-right">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div>
+                                <h5 class="chart-title">CSV File Upload</h5>
+                                <p class="chart-subtitle">Drag &amp; drop or click to select your file</p>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <form th:action="@{/upload}" method="post" enctype="multipart/form-data" id="uploadForm">
+                                <div class="upload-dropzone" id="dropZone">
+                                    <div class="upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <h4>Drop your CSV here</h4>
+                                    <p class="text-muted">or <span class="text-primary fw-semibold" style="cursor:pointer;" onclick="document.getElementById('fileInput').click()">browse from computer</span></p>
+                                    <input type="file" name="file" id="fileInput" class="d-none" accept=".csv">
+                                    <div class="upload-formats mt-2">
+                                        <span class="badge bg-light text-dark me-1">CSV</span>
+                                        <span class="text-muted small">Max 10MB</span>
+                                    </div>
+                                </div>
+
+                                <div id="filePreview" class="file-preview-card d-none">
+                                    <div class="file-preview-icon">
+                                        <i class="fas fa-file-csv"></i>
+                                    </div>
+                                    <div class="file-preview-info">
+                                        <div id="fileName" class="fw-semibold"></div>
+                                        <div id="fileSize" class="small text-muted"></div>
+                                    </div>
+                                    <div class="file-preview-actions">
+                                        <button type="button" class="btn btn-sm btn-light" id="clearFile">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="uploadProgress" class="upload-progress d-none">
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                                             role="progressbar" id="progressBar" style="width: 0%"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <span class="text-primary small fw-semibold" id="progressText">Uploading...</span>
+                                        <span class="small text-muted" id="progressPct">0%</span>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 mt-4 py-3" id="uploadBtn" disabled>
+                                    <i class="fas fa-upload me-2"></i>Upload &amp; Process Data
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CSV Requirements -->
+                <div class="col-xl-5" data-aos="fade-left">
+                    <div class="chart-card mb-4">
+                        <div class="chart-header">
+                            <h5 class="chart-title"><i class="fas fa-list-check me-2 text-primary"></i>Required CSV Columns</h5>
+                        </div>
+                        <div class="chart-body p-0">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead><tr><th>Column</th><th>Type</th><th>Example</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>Order ID</code></td><td><span class="badge bg-info">Text</span></td><td>CA-2024-001</td></tr>
+                                    <tr><td><code>Order Date</code></td><td><span class="badge bg-warning text-dark">Date</span></td><td>1/3/2024</td></tr>
+                                    <tr><td><code>Ship Date</code></td><td><span class="badge bg-warning text-dark">Date</span></td><td>1/7/2024</td></tr>
+                                    <tr><td><code>Ship Mode</code></td><td><span class="badge bg-info">Text</span></td><td>Second Class</td></tr>
+                                    <tr><td><code>Customer Name</code></td><td><span class="badge bg-info">Text</span></td><td>John Smith</td></tr>
+                                    <tr><td><code>Region</code></td><td><span class="badge bg-info">Text</span></td><td>East</td></tr>
+                                    <tr><td><code>Category</code></td><td><span class="badge bg-info">Text</span></td><td>Technology</td></tr>
+                                    <tr><td><code>Product Name</code></td><td><span class="badge bg-info">Text</span></td><td>Laptop Pro</td></tr>
+                                    <tr><td><code>Sales</code></td><td><span class="badge bg-success">Number</span></td><td>1250.00</td></tr>
+                                    <tr><td><code>Quantity</code></td><td><span class="badge bg-success">Number</span></td><td>3</td></tr>
+                                    <tr><td><code>Profit</code></td><td><span class="badge bg-success">Number</span></td><td>375.50</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h5 class="chart-title"><i class="fas fa-lightbulb me-2 text-warning"></i>Upload Tips</h5>
+                        </div>
+                        <div class="chart-body">
+                            <ul class="tips-list">
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Use standard Superstore CSV format</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>First row must be the header</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Supported date formats: M/D/YYYY, YYYY-MM-DD</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Numbers can include commas or $ signs</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Files up to 10MB supported</li>
+                                <li><i class="fas fa-info-circle text-primary me-2"></i>Invalid rows are skipped automatically</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>var currentPage = 'upload';</script>
+<th:block th:replace="~{layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{layout :: head('Settings')}"></th:block>
+</head>
+<body class="app-body">
+<div class="app-wrapper">
+    <th:block th:replace="~{layout :: sidebar}"></th:block>
+    <div class="main-content" id="mainContent">
+        <th:block th:replace="~{layout :: navbar}"></th:block>
+
+        <div class="page-content">
+            <div class="page-header" data-aos="fade-down">
+                <div>
+                    <h1 class="page-title">Settings</h1>
+                    <p class="page-subtitle">Configure your preferences and application settings</p>
+                </div>
+            </div>
+
+            <div th:if="${saved}" class="alert alert-success alert-dismissible fade show" data-aos="fade-down">
+                <i class="fas fa-check-circle me-2"></i>Settings saved successfully.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-xl-8">
+                    <!-- Appearance -->
+                    <div class="chart-card mb-4" data-aos="fade-up">
+                        <div class="chart-header">
+                            <h5 class="chart-title"><i class="fas fa-palette me-2 text-primary"></i>Appearance</h5>
+                        </div>
+                        <div class="chart-body">
+                            <div class="settings-row">
+                                <div>
+                                    <div class="fw-semibold">Dark Mode</div>
+                                    <div class="small text-muted">Switch between light and dark themes</div>
+                                </div>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" id="darkModeSwitch" role="switch">
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="settings-row">
+                                <div>
+                                    <div class="fw-semibold">Compact Sidebar</div>
+                                    <div class="small text-muted">Use icon-only collapsed sidebar by default</div>
+                                </div>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" id="compactSidebar" role="switch">
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Accent Color</label>
+                                <div class="color-picker-group">
+                                    <button class="color-swatch active" data-color="#4e73df" style="background:#4e73df;"></button>
+                                    <button class="color-swatch" data-color="#1cc88a" style="background:#1cc88a;"></button>
+                                    <button class="color-swatch" data-color="#e74a3b" style="background:#e74a3b;"></button>
+                                    <button class="color-swatch" data-color="#f6c23e" style="background:#f6c23e;"></button>
+                                    <button class="color-swatch" data-color="#6f42c1" style="background:#6f42c1;"></button>
+                                    <button class="color-swatch" data-color="#fd7e14" style="background:#fd7e14;"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications -->
+                    <div class="chart-card mb-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="chart-header">
+                            <h5 class="chart-title"><i class="fas fa-bell me-2 text-warning"></i>Notifications</h5>
+                        </div>
+                        <div class="chart-body">
+                            <div class="settings-row">
+                                <div>
+                                    <div class="fw-semibold">Upload Notifications</div>
+                                    <div class="small text-muted">Notify when a CSV file upload completes</div>
+                                </div>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" id="uploadNotif" checked role="switch">
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="settings-row">
+                                <div>
+                                    <div class="fw-semibold">AI Insight Alerts</div>
+                                    <div class="small text-muted">Notify when AI detects anomalies or risks</div>
+                                </div>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" id="aiNotif" checked role="switch">
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="settings-row">
+                                <div>
+                                    <div class="fw-semibold">Low Stock Alerts</div>
+                                    <div class="small text-muted">Notify when stock is predicted to run low</div>
+                                </div>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" id="stockNotif" checked role="switch">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data & Privacy -->
+                    <div class="chart-card mb-4" data-aos="fade-up" data-aos-delay="150">
+                        <div class="chart-header">
+                            <h5 class="chart-title"><i class="fas fa-database me-2 text-info"></i>Data &amp; Privacy</h5>
+                        </div>
+                        <div class="chart-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Default Dashboard View</label>
+                                <select class="form-select" id="defaultView">
+                                    <option value="monthly" selected>Monthly Overview</option>
+                                    <option value="weekly">Weekly Overview</option>
+                                    <option value="category">Category Breakdown</option>
+                                    <option value="regional">Regional View</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Data Retention</label>
+                                <select class="form-select" id="dataRetention">
+                                    <option value="all" selected>Keep all data</option>
+                                    <option value="1year">1 Year</option>
+                                    <option value="6months">6 Months</option>
+                                    <option value="3months">3 Months</option>
+                                </select>
+                            </div>
+                            <div class="settings-row">
+                                <div>
+                                    <div class="fw-semibold">Analytics Tracking</div>
+                                    <div class="small text-muted">Help improve the platform with usage analytics</div>
+                                </div>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" id="analyticsTracking" checked role="switch">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2" data-aos="fade-up" data-aos-delay="200">
+                        <button class="btn btn-primary" id="saveSettingsBtn">
+                            <i class="fas fa-save me-2"></i>Save Settings
+                        </button>
+                        <button class="btn btn-outline-secondary" id="resetSettingsBtn">
+                            <i class="fas fa-undo me-2"></i>Reset to Defaults
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Info Panel -->
+                <div class="col-xl-4">
+                    <div class="chart-card mb-4" data-aos="fade-left">
+                        <div class="chart-header">
+                            <h5 class="chart-title"><i class="fas fa-info-circle me-2 text-info"></i>System Info</h5>
+                        </div>
+                        <div class="chart-body">
+                            <div class="info-row">
+                                <span class="text-muted">Application</span>
+                                <span class="fw-semibold">Supply Chain AI</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="text-muted">Version</span>
+                                <span class="fw-semibold">1.0.0</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="text-muted">AI Model</span>
+                                <span class="fw-semibold">v1.0.0-beta</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="text-muted">Framework</span>
+                                <span class="fw-semibold">Spring Boot 3.2</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="text-muted">Database</span>
+                                <span class="fw-semibold">H2 (Embedded)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var currentPage = 'settings';
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load saved settings from localStorage
+        var theme = localStorage.getItem('theme') || 'light';
+        document.getElementById('darkModeSwitch').checked = theme === 'dark';
+
+        document.getElementById('darkModeSwitch').addEventListener('change', function() {
+            var newTheme = this.checked ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        document.querySelectorAll('.color-swatch').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.color-swatch').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.documentElement.style.setProperty('--primary-color', this.dataset.color);
+                localStorage.setItem('accentColor', this.dataset.color);
+            });
+            if (btn.dataset.color === localStorage.getItem('accentColor')) {
+                document.querySelectorAll('.color-swatch').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+        });
+
+        document.getElementById('saveSettingsBtn').addEventListener('click', function() {
+            // Save preferences to localStorage
+            localStorage.setItem('uploadNotif', document.getElementById('uploadNotif').checked);
+            localStorage.setItem('aiNotif', document.getElementById('aiNotif').checked);
+            localStorage.setItem('stockNotif', document.getElementById('stockNotif').checked);
+            localStorage.setItem('defaultView', document.getElementById('defaultView').value);
+            localStorage.setItem('compactSidebar', document.getElementById('compactSidebar').checked);
+
+            var alert = document.createElement('div');
+            alert.className = 'alert alert-success alert-dismissible fade show mt-3';
+            alert.innerHTML = '<i class="fas fa-check-circle me-2"></i>Settings saved successfully. <button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+            this.parentElement.parentElement.insertBefore(alert, this.parentElement);
+            setTimeout(function() { if (alert.parentElement) alert.parentElement.removeChild(alert); }, 3000);
+        });
+
+        document.getElementById('resetSettingsBtn').addEventListener('click', function() {
+            localStorage.removeItem('theme');
+            localStorage.removeItem('accentColor');
+            localStorage.removeItem('uploadNotif');
+            localStorage.removeItem('aiNotif');
+            localStorage.removeItem('stockNotif');
+            localStorage.removeItem('defaultView');
+            localStorage.removeItem('compactSidebar');
+            location.reload();
+        });
+    });
+</script>
+<th:block th:replace="~{layout :: scripts}"></th:block>
+</body>
+</html>

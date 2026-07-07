@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{layout :: head('Upload History')}"></th:block>
+</head>
+<body class="app-body">
+<div class="app-wrapper">
+    <th:block th:replace="~{layout :: sidebar}"></th:block>
+    <div class="main-content" id="mainContent">
+        <th:block th:replace="~{layout :: navbar}"></th:block>
+
+        <div class="page-content">
+            <div class="page-header" data-aos="fade-down">
+                <div>
+                    <h1 class="page-title">Upload History</h1>
+                    <p class="page-subtitle">All CSV uploads and their processing status</p>
+                </div>
+                <a th:href="@{/upload}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-upload me-1"></i> New Upload
+                </a>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3 col-6" data-aos="zoom-in" data-aos-delay="50">
+                    <div class="stat-mini-card">
+                        <div class="stat-mini-label">Total Uploads</div>
+                        <div class="stat-mini-value" th:text="${#lists.size(uploads)}">0</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="stat-mini-card">
+                        <div class="stat-mini-label">Successful</div>
+                        <div class="stat-mini-value text-success"
+                             th:text="${#lists.isEmpty(uploads) ? 0 : uploads.stream().filter(u -> u.status == 'SUCCESS').count()}">0</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="zoom-in" data-aos-delay="150">
+                    <div class="stat-mini-card">
+                        <div class="stat-mini-label">Total Rows</div>
+                        <div class="stat-mini-value"
+                             th:text="${#lists.isEmpty(uploads) ? 0 : uploads.stream().mapToInt(u -> u.rowCount != null ? u.rowCount : 0).sum()}">0</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="stat-mini-card">
+                        <div class="stat-mini-label">Total Size</div>
+                        <div class="stat-mini-value" id="totalSize">0 KB</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-card" data-aos="fade-up">
+                <div class="table-card-header">
+                    <h5 class="chart-title">Upload Records</h5>
+                    <div class="d-flex gap-2">
+                        <input type="text" id="historySearch" class="form-control form-control-sm"
+                               placeholder="Search files..." style="width:200px;">
+                        <select id="statusFilter" class="form-select form-select-sm" style="width:auto;">
+                            <option value="">All Status</option>
+                            <option value="SUCCESS">Success</option>
+                            <option value="FAILED">Failed</option>
+                            <option value="PROCESSING">Processing</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>File Name</th>
+                                <th>Uploaded By</th>
+                                <th>Upload Time</th>
+                                <th>File Size</th>
+                                <th>Rows Processed</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <tr th:if="${#lists.isEmpty(uploads)}">
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="fas fa-inbox fa-3x mb-3 d-block opacity-50"></i>
+                                    No uploads yet. <a th:href="@{/upload}">Upload your first CSV file</a>
+                                </td>
+                            </tr>
+                            <tr th:each="upload, stat : ${uploads}">
+                                <td class="text-muted small" th:text="${stat.index + 1}">1</td>
+                                <td>
+                                    <i class="fas fa-file-csv text-success me-2"></i>
+                                    <span class="fw-semibold" th:text="${upload.fileName}">file.csv</span>
+                                </td>
+                                <td th:text="${upload.user != null ? upload.user.username : 'Unknown'}">user</td>
+                                <td th:text="${#temporals.format(upload.uploadTime, 'MMM dd, yyyy HH:mm')}">Jan 01, 2024</td>
+                                <td>
+                                    <span th:text="${upload.fileSize != null ? #numbers.formatDecimal(upload.fileSize / 1024.0, 0, 'COMMA', 0, 'POINT') + ' KB' : 'N/A'}">0 KB</span>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold" th:text="${upload.rowCount != null ? upload.rowCount : 0}">0</span>
+                                    <span class="text-muted"> rows</span>
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${upload.status == 'SUCCESS'} ? 'bg-success' : (${upload.status == 'PROCESSING'} ? 'bg-warning text-dark' : 'bg-danger')"
+                                          th:text="${upload.status}">SUCCESS</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    var uploadsData = /*[[${uploads}]]*/ [];
+    var currentPage = 'history';
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search filter
+        document.getElementById('historySearch').addEventListener('input', filterTable);
+        document.getElementById('statusFilter').addEventListener('change', filterTable);
+
+        function filterTable() {
+            var q = document.getElementById('historySearch').value.toLowerCase();
+            var s = document.getElementById('statusFilter').value;
+            var rows = document.querySelectorAll('#historyBody tr[data-file]');
+            // fallback: filter all rows
+            var allRows = document.querySelectorAll('#historyBody tr:not(.no-data-row)');
+            allRows.forEach(function(row) {
+                var text = row.textContent.toLowerCase();
+                var statusCell = row.cells[6] ? row.cells[6].textContent.trim() : '';
+                var matchQ = q === '' || text.includes(q);
+                var matchS = s === '' || statusCell.includes(s);
+                row.style.display = (matchQ && matchS) ? '' : 'none';
+            });
+        }
+
+        // Calculate total size
+        var totalKB = 0;
+        /*[# th:each="upload : ${uploads}"]*/
+            totalKB += /*[[${upload.fileSize != null ? upload.fileSize / 1024.0 : 0}]]*/ 0;
+        /*[/]*/
+        document.getElementById('totalSize').textContent = totalKB > 1024
+            ? (totalKB/1024).toFixed(1) + ' MB'
+            : totalKB.toFixed(0) + ' KB';
+    });
+</script>
+<th:block th:replace="~{layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,1 @@
+- [Supply Chain AI App](supply-chain-ai.md) — Spring Boot 3.2.5 + H2 + Thymeleaf SaaS app at supply-chain-app/, runs on port 8099 via "Supply Chain AI App" workflow.

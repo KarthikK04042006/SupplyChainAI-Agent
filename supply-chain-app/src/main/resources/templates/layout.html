@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' | Supply Chain AI'">Supply Chain AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/animations.css}" rel="stylesheet">
+</head>
+
+<!-- Sidebar Fragment -->
+<nav id="sidebar" th:fragment="sidebar" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <div class="sidebar-brand">
+        <div class="sidebar-logo">
+            <i class="fas fa-link-slash"></i>
+        </div>
+        <div class="sidebar-title">
+            <span class="brand-name">SC AI Agent</span>
+            <span class="brand-sub">Supply Chain Intelligence</span>
+        </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <ul class="nav flex-column sidebar-nav" id="sidebarNav">
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/dashboard}"
+               th:classappend="${currentPage == 'dashboard'} ? 'active' : ''">
+                <span class="nav-icon"><i class="fas fa-th-large"></i></span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/upload}"
+               th:classappend="${currentPage == 'upload'} ? 'active' : ''">
+                <span class="nav-icon"><i class="fas fa-cloud-upload-alt"></i></span>
+                <span class="nav-text">Upload Data</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/analytics}"
+               th:classappend="${currentPage == 'analytics'} ? 'active' : ''">
+                <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+                <span class="nav-text">Analytics</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/ai}"
+               th:classappend="${currentPage == 'ai'} ? 'active' : ''">
+                <span class="nav-icon"><i class="fas fa-robot"></i></span>
+                <span class="nav-text">AI Insights</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/reports}"
+               th:classappend="${currentPage == 'reports'} ? 'active' : ''">
+                <span class="nav-icon"><i class="fas fa-file-chart-line"></i></span>
+                <span class="nav-text">Reports</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/history}"
+               th:classappend="${currentPage == 'history'} ? 'active' : ''">
+                <span class="nav-icon"><i class="fas fa-history"></i></span>
+                <span class="nav-text">Upload History</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/profile}"
+               th:classappend="${currentPage == 'profile'} ? 'active' : ''">
+                <span class="nav-icon"><i class="fas fa-user-circle"></i></span>
+                <span class="nav-text">Profile</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" th:href="@{/settings}"
+               th:classappend="${currentPage == 'settings'} ? 'active' : ''">
+                <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                <span class="nav-text">Settings</span>
+            </a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+            <a class="nav-link sidebar-link" th:href="@{/admin}"
+               th:classappend="${currentPage == 'admin'} ? 'active' : ''">
+                <span class="nav-icon"><i class="fas fa-user-shield"></i></span>
+                <span class="nav-text">Admin Panel</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="sidebar-footer">
+        <div class="sidebar-divider"></div>
+        <a th:href="@{/logout}" class="nav-link sidebar-link text-danger">
+            <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+            <span class="nav-text">Logout</span>
+        </a>
+    </div>
+</nav>
+
+<!-- Navbar Fragment -->
+<nav class="top-navbar" th:fragment="navbar" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <div class="navbar-left">
+        <button id="sidebarToggle" class="sidebar-toggle-btn" type="button">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="globalSearch" class="search-input" placeholder="Search orders, products, regions...">
+            <div id="searchResults" class="search-dropdown d-none"></div>
+        </div>
+    </div>
+    <div class="navbar-right">
+        <button class="icon-btn" id="themeToggle" title="Toggle Dark Mode">
+            <i class="fas fa-moon" id="themeIcon"></i>
+        </button>
+        <div class="notifications-wrapper">
+            <button class="icon-btn" id="notifBtn">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge" id="notifBadge">3</span>
+            </button>
+            <div class="notif-dropdown" id="notifDropdown">
+                <div class="notif-header">
+                    <span>Notifications</span>
+                    <button class="btn-link" id="markAllRead">Mark all read</button>
+                </div>
+                <div class="notif-item unread">
+                    <i class="fas fa-upload text-primary"></i>
+                    <div>
+                        <div class="notif-title">New data uploaded</div>
+                        <div class="notif-time">2 minutes ago</div>
+                    </div>
+                </div>
+                <div class="notif-item unread">
+                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                    <div>
+                        <div class="notif-title">Low stock alert detected</div>
+                        <div class="notif-time">1 hour ago</div>
+                    </div>
+                </div>
+                <div class="notif-item unread">
+                    <i class="fas fa-robot text-success"></i>
+                    <div>
+                        <div class="notif-title">AI model retrained</div>
+                        <div class="notif-time">3 hours ago</div>
+                    </div>
+                </div>
+                <div class="notif-footer">
+                    <a th:href="@{/notifications}">View all notifications</a>
+                </div>
+            </div>
+        </div>
+        <div class="user-menu-wrapper">
+            <button class="user-menu-btn" id="userMenuBtn">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info d-none d-md-block">
+                    <span class="user-name" sec:authentication="name">User</span>
+                    <span class="user-role">Supply Chain Manager</span>
+                </div>
+                <i class="fas fa-chevron-down ms-1"></i>
+            </button>
+            <div class="user-dropdown" id="userDropdown">
+                <a th:href="@{/profile}" class="dropdown-item">
+                    <i class="fas fa-user-circle"></i> My Profile
+                </a>
+                <a th:href="@{/settings}" class="dropdown-item">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+                <div class="dropdown-divider"></div>
+                <a th:href="@{/logout}" class="dropdown-item text-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Scripts Fragment -->
+<th:block th:fragment="scripts">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <script>AOS.init({ duration: 600, easing: 'ease-out-cubic', once: true });</script>
+</th:block>
+</html>

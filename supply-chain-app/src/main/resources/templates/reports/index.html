@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{layout :: head('Reports')}"></th:block>
+</head>
+<body class="app-body">
+<div class="app-wrapper">
+    <th:block th:replace="~{layout :: sidebar}"></th:block>
+    <div class="main-content" id="mainContent">
+        <th:block th:replace="~{layout :: navbar}"></th:block>
+
+        <div class="page-content">
+            <div class="page-header" data-aos="fade-down">
+                <div>
+                    <h1 class="page-title">Report Center</h1>
+                    <p class="page-subtitle">Export supply chain data and AI insights</p>
+                </div>
+            </div>
+
+            <!-- Report Cards -->
+            <div class="row g-4 mb-5">
+                <div class="col-xl-4 col-md-6" data-aos="zoom-in" data-aos-delay="50">
+                    <div class="report-card pdf-card">
+                        <div class="report-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <h4 class="report-title">Executive PDF Report</h4>
+                        <p class="report-desc">Comprehensive summary including KPIs, analytics data, and AI recommendations formatted as a professional PDF document.</p>
+                        <ul class="report-features">
+                            <li><i class="fas fa-check me-2"></i>KPI summary</li>
+                            <li><i class="fas fa-check me-2"></i>Regional breakdown</li>
+                            <li><i class="fas fa-check me-2"></i>AI predictions</li>
+                        </ul>
+                        <a th:href="@{/reports/pdf}" class="btn btn-report btn-pdf w-100">
+                            <i class="fas fa-download me-2"></i>Download PDF
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-md-6" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="report-card excel-card">
+                        <div class="report-icon">
+                            <i class="fas fa-file-excel"></i>
+                        </div>
+                        <h4 class="report-title">Excel Data Export</h4>
+                        <p class="report-desc">Full raw data export with all columns including order details, financials, and logistics for advanced offline analysis.</p>
+                        <ul class="report-features">
+                            <li><i class="fas fa-check me-2"></i>All data columns</li>
+                            <li><i class="fas fa-check me-2"></i>Formatted cells</li>
+                            <li><i class="fas fa-check me-2"></i>Ready for pivot tables</li>
+                        </ul>
+                        <a th:href="@{/reports/excel}" class="btn btn-report btn-excel w-100">
+                            <i class="fas fa-download me-2"></i>Download Excel
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-md-6" data-aos="zoom-in" data-aos-delay="150">
+                    <div class="report-card print-card">
+                        <div class="report-icon">
+                            <i class="fas fa-print"></i>
+                        </div>
+                        <h4 class="report-title">Print Dashboard</h4>
+                        <p class="report-desc">Print-optimized view of the current executive dashboard with charts and KPIs for physical reports or browser PDF.</p>
+                        <ul class="report-features">
+                            <li><i class="fas fa-check me-2"></i>Print-optimized layout</li>
+                            <li><i class="fas fa-check me-2"></i>Charts included</li>
+                            <li><i class="fas fa-check me-2"></i>Save as browser PDF</li>
+                        </ul>
+                        <button onclick="window.print()" class="btn btn-report btn-print w-100">
+                            <i class="fas fa-print me-2"></i>Print Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats for Report -->
+            <div class="row g-4 mb-4">
+                <div class="col-12" data-aos="fade-up">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h5 class="chart-title">Report Preview — Key Metrics</h5>
+                        </div>
+                        <div class="chart-body">
+                            <div class="row g-4">
+                                <div class="col-md-3 text-center">
+                                    <div class="report-stat">
+                                        <div class="report-stat-value" th:text="${summary.totalOrders}">0</div>
+                                        <div class="report-stat-label">Total Orders</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <div class="report-stat">
+                                        <div class="report-stat-value">$<span th:text="${#numbers.formatDecimal(summary.totalSales, 0, 'COMMA', 0, 'POINT')}">0</span></div>
+                                        <div class="report-stat-label">Total Revenue</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <div class="report-stat">
+                                        <div class="report-stat-value">$<span th:text="${#numbers.formatDecimal(summary.totalProfit, 0, 'COMMA', 0, 'POINT')}">0</span></div>
+                                        <div class="report-stat-label">Total Profit</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <div class="report-stat">
+                                        <div class="report-stat-value" th:text="${#numbers.formatDecimal(summary.profitMargin, 1, 1)} + '%'">0%</div>
+                                        <div class="report-stat-label">Profit Margin</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Report History (mock) -->
+            <div class="row" data-aos="fade-up">
+                <div class="col-12">
+                    <div class="table-card">
+                        <div class="table-card-header">
+                            <h5 class="chart-title">Recent Report Activity</h5>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Report Type</th>
+                                        <th>Generated By</th>
+                                        <th>Records</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><i class="fas fa-file-pdf text-danger me-2"></i>Executive Summary (PDF)</td>
+                                        <td sec:authentication="name">User</td>
+                                        <td th:text="${summary.totalOrders}">0</td>
+                                        <td id="todayDate">Today</td>
+                                        <td><span class="badge bg-success">Ready</span></td>
+                                        <td><a th:href="@{/reports/pdf}" class="btn btn-xs btn-outline-danger">Download</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="fas fa-file-excel text-success me-2"></i>Raw Data Export (Excel)</td>
+                                        <td sec:authentication="name">User</td>
+                                        <td th:text="${summary.totalOrders}">0</td>
+                                        <td id="todayDate2">Today</td>
+                                        <td><span class="badge bg-success">Ready</span></td>
+                                        <td><a th:href="@{/reports/excel}" class="btn btn-xs btn-outline-success">Download</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    var summary = { totalOrders: /*[[${summary.totalOrders}]]*/ 0 };
+    var currentPage = 'reports';
+    document.addEventListener('DOMContentLoaded', function() {
+        var d = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+        var els = document.querySelectorAll('#todayDate, #todayDate2');
+        els.forEach(el => el.textContent = d);
+    });
+</script>
+<th:block th:replace="~{layout :: scripts}"></th:block>
+</body>
+</html>
